@@ -5,10 +5,10 @@ def processamento(file):
     dados = pd.read_csv(file)
     return dados, dados.info(), dados['Target'].unique(), dados[['Idade na matrícula', 'Taxa de desemprego', 'Taxa de inflação', 'PIB']].describe()
 
-def plot_analises_demograficas(dados):
+def plot_analises(dados):
     import matplotlib.pyplot as plt
     import seaborn as sns
-    
+    import plotly.express as px
     
     #Gráficos Demográficos
     sns.displot(dados['Idade na matrícula'], bins=20)
@@ -20,12 +20,7 @@ def plot_analises_demograficas(dados):
     sns.countplot(x='Sexo', hue='Target', data=dados)
     plt.show()
     
-def plot_analises_economicas(dados):
-    import seaborn as sns
-    import matplotlib.pyplot as plt
-    import plotly.express as px
-    
-    
+    #Gráfico Econômicos
     color_dict = {'Desistente': 'red', 'Graduado': 'green', 'Matriculado': 'blue'}
     sns.countplot(x='Devedor', hue='Target', data=dados)
     plt.show()
@@ -81,3 +76,20 @@ def applying_model(x_treino, y_treino, x_test, y_test, x_val, y_val):
     y_predtest = rfmodel1.predict(x_test)
     
     return y_predval, y_predtest, print(f'Acurácia de Treino:{rfmodel1.score(x_treino, y_treino)}'), print(f'Acurácia de Validação:{rfmodel1.score(x_val, y_val)}')
+
+def metrics(y_val, predict_validation, y_test, predict_test):
+    from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, classification_report
+    
+    confusion_matrix_validation = confusion_matrix(y_val, predict_validation)
+    confusion_matrix_test = confusion_matrix(y_test, predict_test)
+    
+    accuracy = accuracy_score(y_test, predict_test)
+    precision = precision_score(y_test, predict_test, average='weighted')
+    recall = recall_score(y_test, predict_test, average='weighted')  
+    f1 = f1_score(y_test, predict_test, average='weighted')
+    
+    target_names = ['Desistente', 'Graduando', 'Matriculado']
+    report = classification_report(y_test, predict_test, target_names=target_names)
+    
+    
+    return confusion_matrix_validation, confusion_matrix_test, accuracy, precision, recall, f1, report

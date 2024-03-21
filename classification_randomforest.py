@@ -1,25 +1,19 @@
-from randomforest_functions import processamento, plot_analises_demograficas, plot_analises_economicas, encoder
-from randomforest_functions import feature_engineering, applying_model
-from sklearn.metrics import confusion_matrix, roc_curve
+from randomforest_functions import processamento, plot_analises, encoder
+from randomforest_functions import feature_engineering, applying_model, metrics
+
 
 file = 'dados_estudantes.csv'
 
 dados, dados_info, target_unicos, descibre_numericos = processamento(file) #Processamento dos dados
-analises_demo = plot_analises_demograficas(dados) #Gráfico Demográficos
-print(analises_demo)
-analises_eco = plot_analises_economicas(dados) #Gráficos Econômicos
-print(analises_eco)
+analises_demo = plot_analises(dados) #Gráfico Demográficos
 dados_final = encoder(dados)
 x_treino, y_treino, x_test, y_test, x_val, y_val = feature_engineering(dados_final)
-predict_validation, predict_test, accuracy_train, accuracy_validation = applying_model(x_treino, y_treino, x_test, y_test, x_val, y_val)
-
-print(predict_test)
-print(predict_validation)
-print(accuracy_train)
-print(accuracy_validation)
-
-cm = confusion_matrix(y_val, predict_validation)
-print(cm)
-
-cm1 = confusion_matrix(y_test, predict_test)
-print(cm1)
+y_predval, y_predtest, train_accuracy, val_accuracy = applying_model(x_treino, y_treino, x_test, y_test, x_val, y_val)
+cm_val, cm_test, accuracy, precision, recall, f1, report = metrics(y_val, y_predval, y_test, y_predtest)
+print(cm_val)
+print(cm_test)
+print('Acurácia:', accuracy)
+print('Precisão:', precision)
+print('Sensibilidade:', recall)
+print('F1-score:', f1)
+print(report)
